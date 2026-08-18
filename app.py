@@ -92,16 +92,73 @@ st.markdown("""
     .rec-aguardar { background: #ff880022; color: #ff8800; border: 2px solid #ff8800; }
     .rec-evitar { background: #ff444422; color: #ff4444; border: 2px solid #ff4444; }
     
-    .direcao-box {
-        background: #1a1a1a;
-        border: 2px solid #4a9eff;
-        border-radius: 12px;
-        padding: 20px;
+    /* DIREÇÃO VISUAL GIGANTE COM COR */
+    .direcao-visual {
+        border-radius: 20px;
+        padding: 40px;
         text-align: center;
-        margin: 15px 0;
+        margin: 20px 0;
+        border: 4px solid;
+        position: relative;
+        overflow: hidden;
     }
-    .direcao-titulo { color: #aaaaaa; font-size: 14px; letter-spacing: 2px; }
-    .direcao-valor { color: #4a9eff; font-size: 36px; font-weight: 900; margin: 10px 0; }
+    .direcao-visual::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.1;
+        z-index: 0;
+    }
+    .direcao-jogador {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a1a2a 100%);
+        border-color: #4a9eff;
+        box-shadow: 0 0 30px rgba(74, 158, 255, 0.3);
+    }
+    .direcao-banca {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a0a0a 100%);
+        border-color: #ff4d4d;
+        box-shadow: 0 0 30px rgba(255, 77, 77, 0.3);
+    }
+    .direcao-neutro {
+        background: linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%);
+        border-color: #666;
+        box-shadow: 0 0 30px rgba(100, 100, 100, 0.3);
+    }
+    .direcao-titulo {
+        color: #aaaaaa;
+        font-size: 16px;
+        letter-spacing: 3px;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    .direcao-icone {
+        font-size: 80px;
+        margin: 20px 0;
+        position: relative;
+        z-index: 1;
+    }
+    .direcao-texto {
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        position: relative;
+        z-index: 1;
+    }
+    .direcao-jogador .direcao-texto {
+        color: #4a9eff;
+        text-shadow: 0 0 20px #4a9eff;
+    }
+    .direcao-banca .direcao-texto {
+        color: #ff4d4d;
+        text-shadow: 0 0 20px #ff4d4d;
+    }
+    .direcao-neutro .direcao-texto {
+        color: #888;
+    }
     
     .fator-item {
         background: #1a1a1a;
@@ -604,12 +661,12 @@ else:
 
 st.markdown("---")
 
-# SEÇÃO 4: Botão de Análise com Cooldown
+# SEÇÃO 4: Botão de Análise com Cooldown REDUZIDO (5s)
 st.markdown("### 📈 Análise Profissional")
 
 tempo_atual = time.time()
 tempo_desde_ultima = tempo_atual - st.session_state.ultima_analise
-cooldown = 15
+cooldown = 5  # REDUZIDO de 15s para 5s
 
 pode_analisar = tempo_desde_ultima >= cooldown or not st.session_state.analise_gerada
 
@@ -655,10 +712,26 @@ if st.session_state.ultima_analise_completa:
     
     st.markdown(f'<div class="recomendacao {classe_rec}">⚡ {recomendacao}</div>', unsafe_allow_html=True)
     
+    # DIREÇÃO VISUAL GIGANTE COM COR
+    direcao_limpa = extrair_direcao_limpa(direcao)
+    if direcao_limpa == "Jogador":
+        classe_direcao = "direcao-jogador"
+        icone = "🔵"
+        texto_direcao = "JOGADOR"
+    elif direcao_limpa == "Banca":
+        classe_direcao = "direcao-banca"
+        icone = "🔴"
+        texto_direcao = "BANCA"
+    else:
+        classe_direcao = "direcao-neutro"
+        icone = "⚪"
+        texto_direcao = "EVITAR"
+    
     st.markdown(f"""
-    <div class="direcao-box">
-        <div class="direcao-titulo">DIREÇÃO SUGERIDA PELA MÁQUINA</div>
-        <div class="direcao-valor">{direcao}</div>
+    <div class="direcao-visual {classe_direcao}">
+        <div class="direcao-titulo">🎯 DIREÇÃO SUGERIDA PELA MÁQUINA</div>
+        <div class="direcao-icone">{icone}</div>
+        <div class="direcao-texto">{texto_direcao}</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -702,7 +775,7 @@ else:
     st.info("🧠 Clique em 'GERAR ANÁLISE PRO MAX' para ativar a máquina de análise.")
 
 # ============================================
-# SEÇÃO 6: ESTATÍSTICAS DE ACERTOS (NOVA)
+# SEÇÃO 6: ESTATÍSTICAS DE ACERTOS
 # ============================================
 
 st.markdown("---")
